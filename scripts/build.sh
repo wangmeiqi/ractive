@@ -4,7 +4,7 @@
 set -e
 
 echo "> linting..."
-jshint src
+node_modules/.bin/jshint src
 
 # build library plus tests
 echo "> emptying tmp dir..."
@@ -12,7 +12,7 @@ rm -rf tmp/*
 
 echo "> building Ractive..."
 export COMMIT_HASH=`git rev-parse HEAD`
-gobble build tmp
+node_modules/.bin/gobble build tmp
 
 # run the tests
 echo "> running tests..."
