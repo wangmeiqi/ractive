@@ -17,7 +17,7 @@ try {
 	};
 }
 
-export default function ( html, node, docFrag ) {
+export default function insertHtml ( html, node, docFrag ) {
 	var container, nodes = [], wrapper, selectedOption, child, i;
 
 	// render 0 and false

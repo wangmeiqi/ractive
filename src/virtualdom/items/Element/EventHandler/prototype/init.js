@@ -20,10 +20,10 @@ export default function EventHandler$init ( element, name, template ) {
 		this.invalid = true;
 	}
 
+	// This is a method call
 	if ( template.m ) {
 		refs = template.a.r;
 
-		// This is a method call
 		this.method = template.m;
 		this.keypaths = [];
 		this.fn = getFunctionFromString( template.a.s, refs.length );
@@ -52,6 +52,7 @@ export default function EventHandler$init ( element, name, template ) {
 		this.fire = fireMethodCall;
 	}
 
+	// This is a proxy event
 	else {
 		// Get action ('foo' in 'on-click='foo')
 		action = template.n || template;
@@ -65,8 +66,14 @@ export default function EventHandler$init ( element, name, template ) {
 
 		this.action = action;
 
-		// Get parameters
-		if ( template.d ) {
+		// This handler has non-dynamic params
+		if ( template.a ) {
+			this.params = template.a;
+			this.fire = fireEventWithParams;
+		}
+
+		// This handler has dynamic params
+		else if ( template.d ) {
 			this.dynamicParams = new Fragment({
 				template: template.d,
 				root: this.root,
@@ -74,9 +81,6 @@ export default function EventHandler$init ( element, name, template ) {
 			});
 
 			this.fire = fireEventWithDynamicParams;
-		} else if ( template.a ) {
-			this.params = template.a;
-			this.fire = fireEventWithParams;
 		}
 	}
 }

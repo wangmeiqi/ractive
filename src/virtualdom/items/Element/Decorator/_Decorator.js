@@ -27,10 +27,12 @@ var Decorator = function ( element, template ) {
 		}
 	}
 
+	// This decorator has non-dynamic params
 	if ( template.a ) {
 		this.params = template.a;
 	}
-
+	
+	// This decorator has dynamic params
 	else if ( template.d ) {
 		this.fragment = new Fragment({
 			template: template.d,

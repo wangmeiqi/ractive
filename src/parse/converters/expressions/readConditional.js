@@ -41,6 +41,7 @@ export default function getConditional ( parser ) {
 		parser.error( expectedExpression );
 	}
 
+	// TODO Add documentation for 'o' in the context of conditionals
 	return {
 		t: CONDITIONAL,
 		o: [ expression, ifTrue, ifFalse ]

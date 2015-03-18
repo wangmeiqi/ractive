@@ -31,7 +31,7 @@ makeInfixSequenceMatcher = function ( symbol, fallthrough ) {
 				return left;
 			}
 
-		   parser.allowWhitespace();
+			parser.allowWhitespace();
 
 			// right operand must also consist of only higher-precedence operators
 			right = fallthrough( parser );
@@ -40,6 +40,7 @@ makeInfixSequenceMatcher = function ( symbol, fallthrough ) {
 				return left;
 			}
 
+			// TODO Add documentation for 'o' in the context of infix operators
 			left = {
 				t: INFIX_OPERATOR,
 				s: symbol,

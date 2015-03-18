@@ -25,9 +25,9 @@ makePrefixSequenceMatcher = function ( symbol, fallthrough ) {
 		}
 
 		return {
+			t: PREFIX_OPERATOR,
 			s: symbol,
-			o: expression,
-			t: PREFIX_OPERATOR
+			o: expression
 		};
 	};
 };
