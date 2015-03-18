@@ -11,6 +11,7 @@
 	"-W041": false,
 	"-W030": false,
 	"esnext": true,
+	"strict": false,
 	"globals": {
 		"process": true,
 		"__dirname": true,
