@@ -11,8 +11,17 @@ ExpressionParser = Parser.extend({
 	converters: [ readExpression ]
 });
 
+/**
+ * Parses the directive part of the directive i.e. 'foo(bar)' in 'on-click="foo(bar)"'
+ * 'tokens' can either be a string or an array.
+ * Examples:
+ * 'on-click="foo"' // tokens == "foo"
+ * 'on-click="foo:{{bar}},{{baz}}"' // tokens == [ "foo:", { r: "bar", t: 2 }, ",", { r: "baz", t: 2 } ]
+ * 'on-click="foo(bar)' // tokens == "foo(bar)" <-- method calls are sent in whole
+ */
 // TODO clean this up, it's shocking
 export default function processDirective ( tokens, parentParser ) {
+
 	var result,
 		match,
 		parser,
@@ -24,6 +33,7 @@ export default function processDirective ( tokens, parentParser ) {
 		parsed;
 
 	if ( typeof tokens === 'string' ) {
+		// If this directive is a method call
 		if ( match = methodCallPattern.exec( tokens ) ) {
 			let end = tokens.lastIndexOf(')');
 
@@ -53,7 +63,7 @@ export default function processDirective ( tokens, parentParser ) {
 	directiveName = [];
 	directiveArgs = [];
 
-	if ( tokens) {
+	if ( tokens ) {
 		while ( tokens.length ) {
 			token = tokens.shift();
 
@@ -62,7 +72,9 @@ export default function processDirective ( tokens, parentParser ) {
 
 				if ( colonIndex === -1 ) {
 					directiveName.push( token );
-				} else {
+				}
+
+				else {
 
 					// is the colon the first character?
 					if ( colonIndex ) {
@@ -91,7 +103,8 @@ export default function processDirective ( tokens, parentParser ) {
 	if ( !directiveName.length ) {
 		result = '';
 	}
-	else if ( directiveArgs.length || typeof directiveName !== 'string' ) {
+
+	else { // XXX if ( directiveArgs.length || typeof directiveName !== 'string' ) pretty sure this is always true
 		result = {
 			// TODO is this really necessary? just use the array
 			n: ( directiveName.length === 1 && typeof directiveName[0] === 'string' ? directiveName[0] : directiveName )
@@ -105,8 +118,6 @@ export default function processDirective ( tokens, parentParser ) {
 		else {
 			result.d = directiveArgs;
 		}
-	} else {
-		result = directiveName;
 	}
 
 	return result;
