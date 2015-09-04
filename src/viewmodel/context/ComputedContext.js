@@ -7,8 +7,10 @@ import ComputedStore from '../stores/ComputedStore';
 class ComputedContext extends BindingContext {
 
 	constructor ( key, signature ) {
-		var store = new ComputedStore( signature, this );
-		super ( key, store );
+		var store = new ComputedStore( signature );
+		super( key, store );
+		this.store = store;
+		store.init( this );
 	}
 
 	mark () {

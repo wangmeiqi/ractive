@@ -3,21 +3,27 @@ import { isEqual } from 'utils/is';
 
 class ComputedStore {
 
-	constructor ( signature, context ) {
+	constructor ( signature ) {
 
-		this.context = context;
+		this.context = null;
 
 		this.getter = signature.getter;
 		this.setter = signature.setter;
 
-		const hardDeps = this.hardDeps = signature.deps || [];
+		this.hardDeps = signature.deps || [];
 		this.softDeps = [];
 		this.depValues = {};
 
 		this._dirty = this._firstRun = true;
 
+	}
+
+	init ( context ) {
+		this.context = context;
+
+		const hardDeps = this.hardDeps;
 		if ( hardDeps && hardDeps.length ) {
-			this.hardDeps.forEach( d => d.register( 'mark', context ) );
+			hardDeps.forEach( d => d.register( 'mark', context ) );
 		}
 	}
 
