@@ -288,3 +288,20 @@ test( 'shifting an empty array', t => {
 
 	ractive.shift( 'items' );
 });
+
+test( 'splice with 0 arg (from end) (#2174)', t => {
+	const Item = Ractive.extend({
+		template: '{{value}}'
+	});
+
+	var ractive = new Ractive({
+		el: fixture,
+		template: '{{#items}}<Item />{{/}}',
+		data: { items: [ { value: 1 }, { value: 2 }, { value: 3 } ] },
+		components: { Item },
+	});
+
+	ractive.splice( 'items', 0, 1 );
+	t.deepEqual( ractive.get( 'items' ), [ { value: 2 }, { value: 3 } ] )
+	t.htmlEqual( fixture.innerHTML, '23' );
+});
