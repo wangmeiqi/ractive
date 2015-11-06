@@ -20,6 +20,7 @@ Parser = function ( str, options ) {
 	this.str = str;
 	this.options = options || {};
 	this.pos = 0;
+	this.cache = {};
 
 	this.lines = this.str.split( '\n' );
 	this.lineEnds = this.lines.map( line => {
@@ -112,7 +113,7 @@ Parser.prototype = {
 			anchor = pattern.source[ 0 ] === '^';
 
 			if ( !pattern.global ) {
-				pattern = new RegExp( anchor ? pattern.source.substr( 1 ) : pattern.source , `g${pattern.ignoreCase ? 'i' : ''}${pattern.multiline ? 'm' : ''}${pattern.sticky ? 'y' : ''}${pattern.unicode ? 'u' : ''}` );
+				pattern = ( this.cache[ pattern.source ] || ( this.cache[ pattern.source ] = new RegExp( anchor ? pattern.source.substr( 1 ) : pattern.source , `g${pattern.ignoreCase ? 'i' : ''}${pattern.multiline ? 'm' : ''}${pattern.sticky ? 'y' : ''}${pattern.unicode ? 'u' : ''}` ) ) );
 			}
 
 			pattern.lastIndex = this.pos;
@@ -131,7 +132,7 @@ Parser.prototype = {
 
 			if ( this.pos > 0 ) {
 				if ( !pattern.global ) {
-					pattern = new RegExp( pattern.source , `g${pattern.ignoreCase ? 'i' : ''}${pattern.multiline ? 'm' : ''}${pattern.sticky ? 'y' : ''}${pattern.unicode ? 'u' : ''}` );
+					pattern = ( this.cache[ pattern.source ] || ( this.cache[ pattern.source  ] = new RegExp( pattern.source , `g${pattern.ignoreCase ? 'i' : ''}${pattern.multiline ? 'm' : ''}${pattern.sticky ? 'y' : ''}${pattern.unicode ? 'u' : ''}` ) ) );
 				}
 
 				pattern.lastIndex = this.pos;
