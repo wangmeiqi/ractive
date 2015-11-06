@@ -7,10 +7,10 @@ export default function readComment ( parser, tag ) {
 		return null;
 	}
 
-	index = parser.remaining().indexOf( tag.close );
+	index = parser.indexOf( tag.close );
 
 	if ( index !== -1 ) {
-		parser.pos += index + tag.close.length;
+		parser.pos = index + tag.close.length;
 		return { t: COMMENT };
 	}
 }

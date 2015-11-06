@@ -43,7 +43,7 @@ Parser = function ( str, options ) {
 };
 
 Parser.prototype = {
-	read: function ( converters ) {
+	read( converters ) {
 		var pos, i, len, item;
 
 		if ( !converters ) converters = this.converters;
@@ -62,7 +62,7 @@ Parser.prototype = {
 		return null;
 	},
 
-	getLinePos: function ( char ) {
+	getLinePos( char ) {
 		var lineNum = 0, lineStart = 0, columnNum;
 
 		while ( char >= this.lineEnds[ lineNum ] ) {
@@ -74,7 +74,7 @@ Parser.prototype = {
 		return [ lineNum + 1, columnNum + 1, char ]; // line/col should be one-based, not zero-based!
 	},
 
-	error: function ( message ) {
+	error( message ) {
 		let pos = this.getLinePos( this.pos );
 		let lineNum = pos[0];
 		let columnNum = pos[1];
@@ -98,31 +98,76 @@ Parser.prototype = {
 		throw error;
 	},
 
-	matchString: function ( string ) {
+	matchString( string, advance = true ) {
 		if ( this.str.substr( this.pos, string.length ) === string ) {
-			this.pos += string.length;
+			if ( advance ) this.pos += string.length;
 			return string;
 		}
 	},
 
-	matchPattern: function ( pattern ) {
-		var match;
+	matchPattern( pattern, advance = true ) {
+		var match, anchor;
 
-		if ( match = pattern.exec( this.remaining() ) ) {
-			this.pos += match[0].length;
+		if ( this.pos > 0 ) {
+			anchor = pattern.source[ 0 ] === '^';
+
+			if ( !pattern.global ) {
+				pattern = new RegExp( anchor ? pattern.source.substr( 1 ) : pattern.source , `g${pattern.ignoreCase ? 'i' : ''}${pattern.multiline ? 'm' : ''}${pattern.sticky ? 'y' : ''}${pattern.unicode ? 'u' : ''}` );
+			}
+
+			pattern.lastIndex = this.pos;
+		}
+
+		if ( match = pattern.exec( this.str ) ) {
+			if ( anchor && pattern.lastIndex - match[0].length !== this.pos ) return;
+			if ( advance ) this.pos += match[0].length;
 			return match[1] || match[0];
 		}
 	},
 
-	allowWhitespace: function () {
+	indexOf( string ) {
+		if ( typeof string !== 'string' ) {
+			let match, pattern = string;
+
+			if ( this.pos > 0 ) {
+				if ( !pattern.global ) {
+					pattern = new RegExp( pattern.source , `g${pattern.ignoreCase ? 'i' : ''}${pattern.multiline ? 'm' : ''}${pattern.sticky ? 'y' : ''}${pattern.unicode ? 'u' : ''}` );
+				}
+
+				pattern.lastIndex = this.pos;
+			}
+
+			if ( match = pattern.exec( this.str ) ) {
+				return match.index;
+			} else {
+				return -1;
+			}
+		} else {
+			return this.str.indexOf( string, this.pos );
+		}
+	},
+
+	substr( length ) {
+		return this.str.substr( this.pos, length );
+	},
+
+	substring( index ) {
+		return this.str.substring( this.pos, index );
+	},
+
+	allowWhitespace() {
 		this.matchPattern( leadingWhitespace );
 	},
 
-	remaining: function () {
+	remaining() {
 		return this.str.substring( this.pos );
 	},
 
-	nextChar: function () {
+	hasRemaining() {
+		return this.pos < this.str.length;
+	},
+
+	nextChar() {
 		return this.str.charAt( this.pos );
 	}
 };

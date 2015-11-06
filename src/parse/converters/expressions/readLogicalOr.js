@@ -26,7 +26,7 @@ makeInfixSequenceMatcher = function ( symbol, fallthrough ) {
 			}
 
 			// special case - in operator must not be followed by [a-zA-Z_$0-9]
-			if ( symbol === 'in' && /[a-zA-Z_$0-9]/.test( parser.remaining().charAt( 0 ) ) ) {
+			if ( symbol === 'in' && /[a-zA-Z_$0-9]/.test( parser.nextChar() ) ) {
 				parser.pos = start;
 				return left;
 			}

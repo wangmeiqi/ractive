@@ -1,7 +1,7 @@
 import { CLOSING } from '../../../../config/types';
 
 export default function readClosing ( parser, tag ) {
-	var start, remaining, index, closing;
+	var start, index, closing;
 
 	start = parser.pos;
 
@@ -18,16 +18,15 @@ export default function readClosing ( parser, tag ) {
 
 	parser.allowWhitespace();
 
-	remaining = parser.remaining();
-	index = remaining.indexOf( tag.close );
+	index = parser.indexOf( tag.close );
 
 	if ( index !== -1 ) {
 		closing = {
 			t: CLOSING,
-			r: remaining.substr( 0, index ).split( ' ' )[0]
+			r: parser.substring( index ).split( ' ' )[0]
 		};
 
-		parser.pos += index;
+		parser.pos = index;
 
 		if ( !parser.matchString( tag.close ) ) {
 			parser.error( `Expected closing delimiter '${tag.close}'` );

@@ -12,7 +12,7 @@ export default function readExpressionOrReference ( parser, expectedFollowers ) 
 	}
 
 	for ( i = 0; i < expectedFollowers.length; i += 1 ) {
-		if ( parser.remaining().substr( 0, expectedFollowers[i].length ) === expectedFollowers[i] ) {
+		if ( parser.matchString( expectedFollowers[i], false ) ) {
 			return expression;
 		}
 	}

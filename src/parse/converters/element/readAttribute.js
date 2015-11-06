@@ -1,4 +1,4 @@
-import getLowestIndex from '../utils/getLowestIndex';
+import getLowestIndex, { getRegExp } from '../utils/getLowestIndex';
 import readMustache from '../readMustache';
 import { decodeCharacterReferences } from '../../../utils/html';
 
@@ -144,21 +144,22 @@ function readQuotedAttributeValue ( parser, quoteMark ) {
 }
 
 function readQuotedStringToken ( parser, quoteMark ) {
-	const haystack = parser.remaining();
-
 	let needles = parser.tags.map( t => t.open ); // TODO refactor... we do this in readText.js as well
 	needles.push( quoteMark );
 
-	const index = getLowestIndex( haystack, needles );
+	const index = parser.indexOf( getRegExp( needles ) );
 
 	if ( index === -1 ) {
 		parser.error( 'Quoted attribute value must have a closing quote' );
 	}
 
-	if ( !index ) {
+	if ( !index || parser.pos === index ) {
 		return null;
 	}
 
-	parser.pos += index;
-	return haystack.substr( 0, index );
+	let result = parser.substring( index );
+
+	parser.pos = index;
+
+	return result;
 }

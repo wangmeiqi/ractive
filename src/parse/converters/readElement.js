@@ -53,7 +53,7 @@ function readElement ( parser ) {
 		child,
 		closed,
 		pos,
-		remaining,
+		//remaining,
 		closingTag;
 
 	start = parser.pos;
@@ -175,9 +175,10 @@ function readElement ( parser ) {
 
 		do {
 			pos = parser.pos;
-			remaining = parser.remaining();
+			//remaining = parser.remaining();
 
-			if ( !remaining ) {
+			//if ( !remaining ) {
+			if ( !parser.hasRemaining() ) {
 				parser.error( `Missing end ${
 					parser.elementStack.length > 1 ? 'tags' : 'tag'
 				} (${
@@ -187,7 +188,8 @@ function readElement ( parser ) {
 
 			// if for example we're in an <li> element, and we see another
 			// <li> tag, close the first so they become siblings
-			if ( !canContain( lowerCaseName, remaining ) ) {
+			//if ( !canContain( lowerCaseName, remaining ) ) {
+			if ( !canContain( lowerCaseName, parser ) ) {
 				closed = true;
 			}
 
@@ -266,15 +268,15 @@ function readElement ( parser ) {
 	return element;
 }
 
-function canContain ( name, remaining ) {
+function canContain ( name, parser ) {
 	var match, disallowed;
 
-	match = /^<([a-zA-Z][a-zA-Z0-9]*)/.exec( remaining );
+	match = parser.matchPattern( /^<([a-zA-Z][a-zA-Z0-9]*)/, false );
 	disallowed = disallowedContents[ name ];
 
 	if ( !match || !disallowed ) {
 		return true;
 	}
 
-	return !~disallowed.indexOf( match[1].toLowerCase() );
+	return !~disallowed.indexOf( match.toLowerCase() );
 }

@@ -1,21 +1,19 @@
-import getLowestIndex from './utils/getLowestIndex';
+import { getRegExp } from './utils/getLowestIndex';
 import { decodeCharacterReferences } from '../../utils/html';
 
 export default function readText ( parser ) {
-	var index, remaining, disallowed, barrier;
-
-	remaining = parser.remaining();
+	var index, disallowed, barrier, result;
 
 	if ( parser.textOnlyMode ) {
 		disallowed = parser.tags.map( t => t.open );
 		disallowed = disallowed.concat( parser.tags.map( t => '\\' + t.open ) );
 
-		index = getLowestIndex( remaining, disallowed );
+		index = parser.indexOf( getRegExp( disallowed ) );
 	} else {
 		barrier = parser.inside ? '</' + parser.inside : '<';
 
 		if ( parser.inside && !parser.interpolate[ parser.inside ] ) {
-			index = remaining.indexOf( barrier );
+			index = parser.indexOf( barrier );
 		} else {
 			disallowed = parser.tags.map( t => t.open );
 			disallowed = disallowed.concat( parser.tags.map( t => '\\' + t.open ) );
@@ -31,7 +29,7 @@ export default function readText ( parser ) {
 				disallowed.push( barrier );
 			}
 
-			index = getLowestIndex( remaining, disallowed );
+			index = parser.indexOf( getRegExp( disallowed ) );
 		}
 	}
 
@@ -40,14 +38,16 @@ export default function readText ( parser ) {
 	}
 
 	if ( index === -1 ) {
-		index = remaining.length;
+		index = parser.str.length;
 	}
-
-	parser.pos += index;
 
 	if ( ( parser.inside && parser.inside !== 'textarea' ) || parser.textOnlyMode ) {
-		return remaining.substr( 0, index );
+		result = parser.substring( index );
 	} else {
-		return decodeCharacterReferences( remaining.substr( 0, index ) );
+		result = decodeCharacterReferences( parser.substring( index ) );
 	}
+
+	parser.pos = index;
+
+	return result;
 }

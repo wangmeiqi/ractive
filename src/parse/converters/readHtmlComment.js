@@ -4,7 +4,7 @@ var OPEN_COMMENT = '<!--',
 	CLOSE_COMMENT = '-->';
 
 export default function readHtmlComment ( parser ) {
-	var start, content, remaining, endIndex, comment;
+	var start, content, endIndex, comment;
 
 	start = parser.pos;
 
@@ -12,15 +12,14 @@ export default function readHtmlComment ( parser ) {
 		return null;
 	}
 
-	remaining = parser.remaining();
-	endIndex = remaining.indexOf( CLOSE_COMMENT );
+	endIndex = parser.indexOf( CLOSE_COMMENT );
 
 	if ( endIndex === -1 ) {
 		parser.error( 'Illegal HTML - expected closing comment sequence (\'-->\')' );
 	}
 
-	content = remaining.substr( 0, endIndex );
-	parser.pos += endIndex + 3;
+	content = parser.substring( endIndex );
+	parser.pos = endIndex + 3;
 
 	comment = {
 		t: COMMENT,
