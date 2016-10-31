@@ -29,6 +29,8 @@ If you don't find what you're looking for in the [docs](http://docs.ractivejs.or
 
 If you'd like to include an example in your issue, [this fiddle](https://jsfiddle.net/evschris/wxc00vup/) has a convenient minimal setup that has easily switchable Ractive versions.
 
+Ractive has a two-version support policy, where the last two released series are actively maintained. See the [support/maintenance policy](./SUPPORT.md) for more info.
+
 
 ## Contributing
 
