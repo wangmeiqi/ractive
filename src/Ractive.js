@@ -40,6 +40,25 @@ export default function Ractive ( options ) {
 	initialise( this, options || {}, {} );
 }
 
+// check to see if we need to force Ractive as a global for some weird environments
+if ( win && !win.Ractive ) {
+	let src;
+	if ( document.currentScript ) {
+		src = document.currentScript.src;
+	}
+	// IE, old Safari
+	else {
+		const scripts = document.querySelectorAll( 'script[src]' );
+		if ( scripts.length > 0 ) src = scripts[ scripts.length - 1 ].src;
+	}
+
+	if ( src && ~src.indexOf( 'RactiveForceGlobal' ) ) {
+		if ( !win.Ractive ) {
+			win.Ractive = Ractive;
+		}
+	}
+}
+
 extendObj( Ractive.prototype, proto, defaults );
 Ractive.prototype.constructor = Ractive;
 
