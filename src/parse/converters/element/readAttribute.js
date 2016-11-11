@@ -7,7 +7,7 @@ import flattenExpression from '../../utils/flattenExpression';
 
 const attributeNamePattern = /^[^\s"'>\/=]+/;
 const onPattern = /^on/;
-const eventPattern = /^on-([a-zA-Z\\*\\.$_][a-zA-Z\\*\\.$_0-9\-]+)$/;
+const eventPattern = /^on-([a-zA-Z\*\.$_]((?:[a-zA-Z\*\.$_0-9\-]|\\-)+))$/;
 const reservedEventNames = /^(?:change|reset|teardown|update|construct|config|init|render|complete|unrender|detach|insert|destruct|attachchild|detachchild)$/;
 const decoratorPattern = /^as-([a-z-A-Z][-a-zA-Z_0-9]*)$/;
 const transitionPattern = /^([a-zA-Z](?:(?!-in-out)[-a-zA-Z_0-9])*)-(in|out|in-out)$/;
@@ -18,6 +18,23 @@ const directives = {
 const unquotedAttributeValueTextPattern = /^[^\s"'=<>`]+/;
 const proxyEvent = /^[^\s"'=<>@\[\]()]*/;
 const whitespace = /^\s+/;
+
+const splitPattern = /([^\\](?:\\\\)*)\-/;
+const slashes = /\\/g;
+function splitEvent ( str ) {
+	const result = [];
+	let match;
+
+	while ( match = splitPattern.exec( str ) ) {
+		const index = match.index + match[1].length;
+		result.push( str.substr( 0, index ).replace( slashes, '' ) );
+		str = str.substr( index + 1 );
+	}
+
+	result.push( str.replace( slashes, '' ) );
+
+	return result;
+}
 
 export default function readAttribute ( parser ) {
 	let name, i, nearest, idx;
@@ -210,7 +227,8 @@ export function readAttributeOrDirective ( parser ) {
 
 		// on-click etc
 	else if ( match = eventPattern.exec( attribute.n ) ) {
-		attribute.n = match[1];
+
+		attribute.n = splitEvent( match[1] );
 		attribute.t = EVENT;
 
 			// check for a proxy event
